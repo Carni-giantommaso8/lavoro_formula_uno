@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ScuderiaService {
   private apiUrl = 'https://reimagined-dollop-q7pjjg4gwww6fx5v-5000.app.github.dev/api/scuderie'; 
-  private sponsorUrl = 'https://glowing-xylophone-r456g4p5v9gwh4j5-5000.app.github.dev/api/sponsor';
+  private sponsorUrl = 'https://reimagined-dollop-q7pjjg4gwww6fx5v-5000.app.github.dev/api/sponsor';
 
   constructor(private http: HttpClient) { }
 
