@@ -1,11 +1,11 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
-import { ScuderiaComponent } from './scuderia/scuderia';
-
+import { Scuderia } from './scuderia/scuderia';
+import { SponsorComponent } from './sponsor/sponsor';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, ScuderiaComponent, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, Scuderia, SponsorComponent, RouterLink, RouterLinkActive],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })

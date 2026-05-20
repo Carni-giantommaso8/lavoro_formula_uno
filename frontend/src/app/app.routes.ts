@@ -1,8 +1,9 @@
 import { Routes } from '@angular/router';
-import { ScuderiaComponent } from './scuderia/scuderia';
+import { Scuderia } from './scuderia/scuderia';
+import { SponsorComponent } from './sponsor/sponsor';
 
 export const routes: Routes = [
-    { path: 'scuderia', component: ScuderiaComponent },
-    {path: '', redirectTo: '/scuderia', pathMatch: 'full'},
+    {path: 'scuderie', component: Scuderia},
+    {path: 'sponsor', component: SponsorComponent},
+    {path: '', redirectTo: '/scuderie', pathMatch: 'full'}
 ];
-

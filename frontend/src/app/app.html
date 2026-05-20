@@ -1,1 +1,22 @@
-<app-scuderia></app-scuderia>
+<nav class="navbar navbar-expand-lg navbar-dark bg-danger shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#">🏎️ F1 Manager</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/scuderie" routerLinkActive="active">Scuderie</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/sponsor" routerLinkActive="active">Sponsor</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/piloti" routerLinkActive="active">Piloti</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<div class="container mt-4">
+  <router-outlet></router-outlet>
+</div>

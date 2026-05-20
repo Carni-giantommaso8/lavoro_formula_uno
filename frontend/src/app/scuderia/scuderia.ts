@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './scuderia.html',
   styleUrl: './scuderia.css'
 })
-export class ScuderiaComponent implements OnInit {
+export class Scuderia implements OnInit {
   scuderie = signal<any[]>([]);
   sponsor = signal<any[]>([]);
   mostraForm = signal(false);
