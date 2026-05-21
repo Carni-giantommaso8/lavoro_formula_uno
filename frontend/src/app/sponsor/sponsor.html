@@ -1,0 +1,75 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="m-0">💰 Gestione Sponsor</h2>
+  <button class="btn btn-primary fw-bold shadow-sm" (click)="mostraForm() ? annullaForm() : mostraForm.set(true)">
+    {{ mostraForm() ? 'Chiudi' : '+ Aggiungi Sponsor' }}
+  </button>
+</div>
+
+@if (mostraForm()) {
+  <div class="card p-4 mb-4 border-primary shadow-sm">
+    <h4 class="text-primary mb-3">
+      {{ sponsorInModifica() ? 'Modifica Azienda Sponsor' : 'Nuova Azienda Sponsor' }}
+    </h4>
+    <form (ngSubmit)="salvaSponsor()">
+      <div class="row align-items-center">
+        <div class="col-md-3 mb-2">
+          <input type="text" class="form-control" placeholder="Ragione Sociale" [(ngModel)]="nuovoSponsor.nome_societa" name="nome" required>
+        </div>
+        <div class="col-md-3 mb-2">
+          <input type="text" class="form-control" placeholder="Settore Merceologico" [(ngModel)]="nuovoSponsor.settore_merceologico" name="settore" required>
+        </div>
+        <div class="col-md-2 mb-2">
+          <input type="number" class="form-control" placeholder="Budget Annuo (€)" [(ngModel)]="nuovoSponsor.valore_contratto_annuo" name="valore" required>
+        </div>
+        <div class="col-md-2 mb-2">
+          <input type="date" class="form-control" [(ngModel)]="nuovoSponsor.scadenza_contratto" name="scadenza" required>
+        </div>
+        
+        <div class="col-md-2 mb-2 d-flex gap-1">
+          @if (sponsorInModifica()) {
+            <button type="button" class="btn btn-secondary w-50" (click)="annullaForm()">Annulla</button>
+          }
+          <button type="submit" class="btn btn-primary" [class.w-50]="sponsorInModifica()" [class.w-100]="!sponsorInModifica()">
+            {{ sponsorInModifica() ? 'Aggiorna' : 'Salva' }}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+}
+
+<div class="card shadow-sm border-0">
+  <div class="card-body p-0">
+    <table class="table table-hover table-striped m-0 align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Nome Società</th>
+          <th>Settore</th>
+          <th>Valore Contratto</th>
+          <th>Scadenza</th>
+          <th class="text-end px-4">Azioni</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (sp of sponsors(); track sp.id) {
+          <tr>
+            <td class="fw-bold text-muted">#{{ sp.id }}</td>
+            <td class="fw-bold">{{ sp.nome_societa }}</td>
+            <td><span class="badge bg-secondary">{{ sp.settore_merceologico }}</span></td>
+            <td class="text-success fw-bold">{{ sp.valore_contratto_annuo | currency:'EUR':'symbol':'1.2-2' }}</td>
+            <td>{{ sp.scadenza_contratto | date:'dd/MM/yyyy' }}</td>
+            <td class="text-end px-4">
+              <button class="btn btn-outline-primary btn-sm me-1" (click)="avviaModifica(sp)">Modifica</button>
+              <button class="btn btn-outline-danger btn-sm" (click)="elimina(sp.id)">Elimina</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6" class="text-center py-4 text-muted">Nessun azienda sponsor censita nel database.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

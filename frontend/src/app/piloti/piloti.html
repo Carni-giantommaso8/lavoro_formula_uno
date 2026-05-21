@@ -1,0 +1,203 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="m-0">🏎️ Gestione Piloti</h2>
+  <button class="btn btn-success fw-bold shadow-sm" (click)="mostraForm.set(!mostraForm())">
+    {{ mostraForm() ? 'Chiudi' : '+ Aggiungi Pilota' }}
+  </button>
+</div>
+
+@if (mostraForm()) {
+  <div class="card p-4 mb-4 border-success shadow-sm">
+    <h4 class="text-success mb-3">{{ pilotaInModifica() ? 'Modifica Pilota' : 'Nuovo Pilota' }}</h4>
+    <form (ngSubmit)="salvaPilota()">
+      <div class="row align-items-center">
+        <div class="col-md-2 mb-2">
+          <input type="text" class="form-control" placeholder="Nome" [(ngModel)]="nuovoPilota.nome" name="nome" required>
+        </div>
+        <div class="col-md-2 mb-2">
+          <input type="text" class="form-control" placeholder="Cognome" [(ngModel)]="nuovoPilota.cognome" name="cognome" required>
+        </div>
+        <div class="col-md-2 mb-2">
+          <input type="date" class="form-control" [(ngModel)]="nuovoPilota.data_nascita" name="data_nascita" required>
+        </div>
+        <div class="col-md-2 mb-2">
+          <input type="text" class="form-control" placeholder="Nazionalità" [(ngModel)]="nuovoPilota.nazionalita" name="nazionalita" required>
+        </div>
+        <div class="col-md-1 mb-2">
+          <input type="number" class="form-control" placeholder="N°" [(ngModel)]="nuovoPilota.numero_gara" name="numero_gara" required>
+        </div>
+        <div class="col-md-2 mb-2">
+          <input type="number" class="form-control" placeholder="Stipendio" [(ngModel)]="nuovoPilota.stipendio_annuo" name="stipendio_annuo" required>
+        </div>
+        <div class="col-md-2 mb-2">
+          <select class="form-select" [(ngModel)]="nuovoPilota.id_scuderia" name="scuderia" required>
+            <option [ngValue]="null" disabled selected>Scegli Scuderia...</option>
+            @for (sc of scuderie(); track sc.id) {
+              <option [ngValue]="sc.id">{{ sc.nome }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-1 mb-2 d-flex gap-1">
+          @if (pilotaInModifica()) {
+            <button type="button" class="btn btn-secondary w-50" (click)="annullaForm()">Annulla</button>
+          }
+          <button type="submit" class="btn btn-success"
+            [class.w-50]="pilotaInModifica()" [class.w-100]="!pilotaInModifica()">
+            {{ pilotaInModifica() ? 'Aggiorna' : 'Salva' }}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+}
+
+<!-- CARDS -->
+<div class="row">
+  @for (p of piloti(); track p.id) {
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm h-100 border-danger pilota-card" (click)="apriDettaglio(p)">
+        <div class="card-body">
+          <h4 class="card-title text-danger fw-bold">{{ p.nome }} {{ p.cognome }}</h4>
+          <h6 class="card-subtitle mb-3 text-muted">
+            <span class="badge bg-danger me-2">#{{ p.numero_gara }}</span>{{ p.nazionalita }}
+          </h6>
+          <p class="card-text">
+            <strong>Data di Nascita:</strong> {{ p.data_nascita | date:'dd/MM/yyyy' }}<br>
+            <strong>Stipendio:</strong> {{ p.stipendio_annuo | currency:'USD':'symbol':'1.0-0' }}<br>
+            <span class="badge bg-secondary">Team: {{ p.nome_scuderia || 'Nessuna' }}</span>
+          </p>
+        </div>
+        <div class="card-footer bg-white border-0 d-flex justify-content-between pb-3"
+             (click)="$event.stopPropagation()">
+          <button class="btn btn-outline-primary btn-sm" (click)="avviaModifica(p)">Modifica</button>
+          <button class="btn btn-outline-danger btn-sm" (click)="elimina(p.id)">Elimina</button>
+        </div>
+      </div>
+    </div>
+  } @empty {
+    <div class="col-12 text-center mt-5">
+      <p class="text-muted">Nessun pilota trovato nel database.</p>
+    </div>
+  }
+</div>
+
+<!-- MODAL -->
+@if (modalAperto()) {
+  <!-- Backdrop -->
+  <div class="modal-backdrop-f1" (click)="chiudiModal()"></div>
+
+  <!-- Dialog centrato -->
+  <div class="modal-wrapper-f1">
+    <div class="modal-dialog-f1" (click)="$event.stopPropagation()">
+
+      <!-- Header rosso -->
+      <div class="modal-header-f1">
+        <div>
+          <span class="badge bg-white text-danger fs-5 me-2">#{{ pilotaSelezionato()?.numero_gara }}</span>
+          <span class="fs-4 fw-bold">{{ pilotaSelezionato()?.nome }} {{ pilotaSelezionato()?.cognome }}</span>
+        </div>
+        <button class="btn btn-sm btn-outline-light fw-bold" (click)="chiudiModal()">✕</button>
+      </div>
+
+      <!-- Body -->
+      <div class="modal-body-f1">
+
+        <!-- PILOTA -->
+        <div class="row align-items-center mb-4">
+          <div class="col-md-5 text-center">
+            @if (getFotoPilota(pilotaSelezionato()?.numero_gara)) {
+              <img [src]="getFotoPilota(pilotaSelezionato()?.numero_gara)"
+                   alt="Foto pilota"
+                   class="foto-pilota-modal"
+                   (error)="$any($event.target).style.display='none'">
+            } @else {
+              <div class="placeholder-foto">👤</div>
+            }
+          </div>
+          <div class="col-md-7">
+            <h5 class="text-danger fw-bold mb-3">📋 Dati Pilota</h5>
+            <table class="table table-sm table-borderless mb-0">
+              <tbody>
+                <tr>
+                  <td class="fw-semibold text-muted" style="width:45%">Nome completo</td>
+                  <td class="fw-bold">{{ pilotaSelezionato()?.nome }} {{ pilotaSelezionato()?.cognome }}</td>
+                </tr>
+                <tr>
+                  <td class="fw-semibold text-muted">Nazionalità</td>
+                  <td>{{ pilotaSelezionato()?.nazionalita }}</td>
+                </tr>
+                <tr>
+                  <td class="fw-semibold text-muted">Data di nascita</td>
+                  <td>{{ pilotaSelezionato()?.data_nascita | date:'dd/MM/yyyy' }}</td>
+                </tr>
+                <tr>
+                  <td class="fw-semibold text-muted">Numero di gara</td>
+                  <td><span class="badge bg-danger fs-6">#{{ pilotaSelezionato()?.numero_gara }}</span></td>
+                </tr>
+                <tr>
+                  <td class="fw-semibold text-muted">Stipendio annuo</td>
+                  <td class="fw-bold text-success">{{ pilotaSelezionato()?.stipendio_annuo | currency:'USD':'symbol':'1.0-0' }}</td>
+                </tr>
+                <tr>
+                  <td class="fw-semibold text-muted">Team</td>
+                  <td><span class="badge bg-secondary">{{ pilotaSelezionato()?.nome_scuderia }}</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <hr class="border-danger opacity-25">
+
+        <!-- MACCHINA -->
+        @if (macchinaSelezionata()) {
+          <h5 class="text-danger fw-bold mb-3">🏎️ La sua Macchina</h5>
+          <div class="row align-items-center">
+            <div class="col-12 text-center mb-3">
+              @if (getFotoMacchina(macchinaSelezionata()?.modello_sigla)) {
+                <img [src]="getFotoMacchina(macchinaSelezionata()?.modello_sigla)"
+                     alt="Foto macchina"
+                     class="foto-macchina-modal"
+                     (error)="$any($event.target).style.display='none'">
+              } @else {
+                <div class="placeholder-foto">🏎️</div>
+              }
+            </div>
+            <div class="col-12">
+              <div class="row">
+                <div class="col-md-6">
+                  <table class="table table-sm table-borderless mb-0">
+                    <tbody>
+                      <tr>
+                        <td class="fw-semibold text-muted">Modello</td>
+                        <td><span class="badge bg-dark fs-6">{{ macchinaSelezionata()?.modello_sigla }}</span></td>
+                      </tr>
+                      <tr>
+                        <td class="fw-semibold text-muted">Power Unit</td>
+                        <td>{{ macchinaSelezionata()?.power_unit_modello }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="col-md-6">
+                  <table class="table table-sm table-borderless mb-0">
+                    <tbody>
+                      <tr>
+                        <td class="fw-semibold text-muted">Peso</td>
+                        <td><strong>{{ macchinaSelezionata()?.peso_kg }} kg</strong></td>
+                      </tr>
+                      <tr>
+                        <td class="fw-semibold text-muted">Scuderia</td>
+                        <td>{{ macchinaSelezionata()?.nome_scuderia }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+      </div>
+    </div>
+  </div>
+}

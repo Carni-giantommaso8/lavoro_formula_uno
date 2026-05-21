@@ -1,0 +1,75 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="m-0">🏁 Gestione Scuderie</h2>
+  <button class="btn btn-success fw-bold shadow-sm" (click)="mostraForm.set(!mostraForm())">
+    {{ mostraForm() ? 'Chiudi' : '+ Aggiungi Scuderia' }}
+  </button>
+</div>
+
+@if (mostraForm()) {
+  <div class="card p-4 mb-4 border-success shadow-sm">
+    <h4 class="text-success mb-3">
+      {{ scuderiaInModifica() ? 'Modifica Team' : 'Nuovo Team' }}
+    </h4>
+    
+    <form (ngSubmit)="salvaScuderia()">
+      <div class="row align-items-center">
+        <div class="col-md-2 mb-2">
+          <input type="text" class="form-control" placeholder="Nome Scuderia" [(ngModel)]="nuovaScuderia.nome" name="nome" required>
+        </div>
+        <div class="col-md-2 mb-2">
+          <input type="text" class="form-control" placeholder="Team Principal" [(ngModel)]="nuovaScuderia.team_principal" name="tp" required>
+        </div>
+        <div class="col-md-2 mb-2">
+          <input type="text" class="form-control" placeholder="Motore" [(ngModel)]="nuovaScuderia.costruttore_motore" name="motore" required>
+        </div>
+        <div class="col-md-2 mb-2">
+          <input type="number" class="form-control" placeholder="Anno" [(ngModel)]="nuovaScuderia.anno_fondazione" name="anno" required>
+        </div>
+        
+        <div class="col-md-2 mb-2">
+          <select class="form-select" [(ngModel)]="nuovaScuderia.id_sponsor" name="sponsor" required>
+            <option [ngValue]="null" disabled selected>Scegli Sponsor...</option>
+            @for (sp of sponsor(); track sp.id) {
+              <option [ngValue]="sp.id">{{ sp.nome_societa }}</option>
+            }
+          </select>
+        </div>
+        
+        <div class="col-md-2 mb-2 d-flex gap-1">
+          @if (scuderiaInModifica()) {
+            <button type="button" class="btn btn-secondary w-50" (click)="annullaForm()">Annulla</button>
+          }
+          <button type="submit" class="btn btn-success" [class.w-50]="scuderiaInModifica()" [class.w-100]="!scuderiaInModifica()">
+            {{ scuderiaInModifica() ? 'Aggiorna' : 'Salva' }}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+}
+
+<div class="row">
+  @for (s of scuderie(); track s.id) {
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm h-100 border-danger">
+        <div class="card-body">
+          <h4 class="card-title text-danger fw-bold">{{ s.nome }}</h4>
+          <h6 class="card-subtitle mb-3 text-muted">Team Principal: {{ s.team_principal }}</h6>
+          <p class="card-text">
+            <strong>Motore:</strong> {{ s.costruttore_motore }}<br>
+            <strong>Fondazione:</strong> {{ s.anno_fondazione }}<br>
+            <span class="badge bg-secondary">Sponsor: {{ s.nome_sponsor || 'Nessuno' }}</span>
+          </p>
+        </div>
+        <div class="card-footer bg-white border-0 d-flex justify-content-between pb-3">
+          <button class="btn btn-outline-primary btn-sm" (click)="avviaModifica(s)">Modifica</button>
+          <button class="btn btn-outline-danger btn-sm" (click)="elimina(s.id)">Elimina</button>
+        </div>
+      </div>
+    </div>
+  } @empty {
+    <div class="col-12 text-center mt-5">
+      <p class="text-muted">Nessuna scuderia trovata nel database.</p>
+    </div>
+  }
+</div>
