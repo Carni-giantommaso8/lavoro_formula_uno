@@ -1,0 +1,137 @@
+<h2 class="m-0 mb-4">🏆 Classifiche 2026</h2>
+
+<div class="row g-4">
+
+  <!-- CLASSIFICA PILOTI -->
+  <div class="col-12 col-xl-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-header text-white fw-bold fs-5" style="background-color: #1a1a1a;">
+        🧑‍✈️ Classifica Piloti
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="table-light">
+            <tr>
+              <th class="ps-3" style="width:50px;">POS</th>
+              <th>PILOTA</th>
+              <th>TEAM</th>
+              <th class="text-center">VITTORIE</th>
+              <th class="text-center">GIRO VELOCE</th>
+              <th class="text-end pe-3">PUNTI</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (p of classificaPiloti(); track p.id; let i = $index) {
+              <tr>
+                <td class="ps-3">
+                  <span class="fw-bold"
+                    [class.text-warning]="i === 0"
+                    [class.text-secondary]="i === 1"
+                    [class.text-danger]="i === 2">
+                    {{ i + 1 }}
+                  </span>
+                </td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-dark">#{{ p.numero_gara }}</span>
+                    <div>
+                      <div class="fw-bold">{{ p.nome }} {{ p.cognome }}</div>
+                      <div class="text-muted small">{{ p.nazionalita }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="small text-muted">{{ p.nome_scuderia || '—' }}</td>
+                <td class="text-center">
+                  @if (p.vittorie > 0) {
+                    <span class="badge bg-success">{{ p.vittorie }} vitt.</span>
+                  } @else { <span class="text-muted">—</span> }
+                </td>
+                <td class="text-center">
+                  @if (p.giri_veloci > 0) {
+                    <span class="badge bg-primary">{{ p.giri_veloci }} g.v.</span>
+                  } @else { <span class="text-muted">—</span> }
+                </td>
+                <td class="text-end pe-3">
+                  <div class="d-flex flex-column align-items-end gap-1">
+                    <strong>{{ p.punti_totali }}</strong>
+                    <div class="progress w-100" style="height:4px; max-width:80px;">
+                      <div class="progress-bar bg-danger"
+                           [style.width]="classificaPiloti()[0].punti_totali > 0
+                             ? (p.punti_totali / classificaPiloti()[0].punti_totali * 100) + '%'
+                             : '0%'">
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="6" class="text-center text-muted py-4">Nessun dato disponibile.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CLASSIFICA COSTRUTTORI -->
+  <div class="col-12 col-xl-6">
+    <div class="card shadow-sm border-0 h-100">
+      <div class="card-header text-white fw-bold fs-5" style="background-color: #1a1a1a;">
+        🏎️ Classifica Costruttori
+      </div>
+      <div class="table-responsive">
+        <table class="table table-hover mb-0 align-middle">
+          <thead class="table-light">
+            <tr>
+              <th class="ps-3" style="width:50px;">POS</th>
+              <th>SCUDERIA</th>
+              <th>MOTORE</th>
+              <th class="text-center">VITTORIE</th>
+              <th class="text-end pe-3">PUNTI</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (s of classificaCostruttori(); track s.id; let i = $index) {
+              <tr>
+                <td class="ps-3">
+                  <span class="fw-bold"
+                    [class.text-warning]="i === 0"
+                    [class.text-secondary]="i === 1"
+                    [class.text-danger]="i === 2">
+                    {{ i + 1 }}
+                  </span>
+                </td>
+                <td class="fw-bold">{{ s.nome }}</td>
+                <td class="small text-muted">{{ s.costruttore_motore }}</td>
+                <td class="text-center">
+                  @if (s.vittorie > 0) {
+                    <span class="badge bg-success">{{ s.vittorie }} vitt.</span>
+                  } @else { <span class="text-muted">—</span> }
+                </td>
+                <td class="text-end pe-3">
+                  <div class="d-flex flex-column align-items-end gap-1">
+                    <strong>{{ s.punti_totali }}</strong>
+                    <div class="progress w-100" style="height:4px; max-width:80px;">
+                      <div class="progress-bar bg-danger"
+                           [style.width]="classificaCostruttori()[0].punti_totali > 0
+                             ? (s.punti_totali / classificaCostruttori()[0].punti_totali * 100) + '%'
+                             : '0%'">
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="text-center text-muted py-4">Nessun dato disponibile.</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
