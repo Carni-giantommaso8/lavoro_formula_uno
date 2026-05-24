@@ -1,0 +1,131 @@
+<div class="classifiche-container">
+
+  <div class="header">
+    <h1 class="titolo">🏆 Classifiche F1 2026</h1>
+
+    <div class="filtro-sprint">
+      <span class="filtro-label">Modalità punti:</span>
+      <div class="toggle-wrapper">
+        <button class="toggle-btn" [class.attivo]="!includiSprint()" (click)="includiSprint() && toggleSprint()">
+          Senza Sprint
+        </button>
+        <button class="toggle-btn" [class.attivo]="includiSprint()" (click)="!includiSprint() && toggleSprint()">
+          Con Sprint
+        </button>
+      </div>
+      <span class="punti-badge" [class.sprint]="includiSprint()">
+        {{ includiSprint() ? '🏁 Sprint incluse' : '🚦 Solo gare' }}
+      </span>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn" [class.attivo]="vistaAttiva() === 'piloti'" (click)="setVista('piloti')">
+        👤 Piloti
+      </button>
+      <button class="tab-btn" [class.attivo]="vistaAttiva() === 'costruttori'" (click)="setVista('costruttori')">
+        🏎️ Costruttori
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading()" class="loading">
+    <div class="spinner"></div>
+    <p>Caricamento classifica...</p>
+  </div>
+
+  <div *ngIf="errore()" class="errore">{{ errore() }}</div>
+
+  <!-- Classifica Piloti -->
+  <div *ngIf="!loading() && vistaAttiva() === 'piloti'" class="tabella-wrapper">
+    <table class="tabella-classifica">
+      <thead>
+        <tr>
+          <th class="col-pos">Pos</th>
+          <th class="col-num">#</th>
+          <th class="col-pilota">Pilota</th>
+          <th class="col-scuderia">Scuderia</th>
+          <th class="col-vittorie">Vittorie</th>
+          <th class="col-podi">Podi</th>
+          <th class="col-punti">Punti</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let pilota of piloti(); let i = index"
+            class="riga"
+            [class.podio-1]="i === 0"
+            [class.podio-2]="i === 1"
+            [class.podio-3]="i === 2">
+          <td class="col-pos">
+            <span class="posizione" [class.oro]="i===0" [class.argento]="i===1" [class.bronzo]="i===2">
+              {{ i + 1 }}
+            </span>
+          </td>
+          <td class="col-num">
+            <span class="numero-gara" [style.borderColor]="getScuderiaColore(pilota.scuderia)">
+              {{ pilota.numero_gara }}
+            </span>
+          </td>
+          <td class="col-pilota">
+            <span class="nome">{{ pilota.nome }}</span>
+            <span class="cognome">{{ pilota.cognome }}</span>
+          </td>
+          <td class="col-scuderia">
+            <span class="scuderia-badge"
+                  [style.backgroundColor]="getScuderiaColore(pilota.scuderia) + '22'"
+                  [style.borderColor]="getScuderiaColore(pilota.scuderia)">
+              {{ pilota.scuderia }}
+            </span>
+          </td>
+          <td class="col-vittorie">{{ pilota.vittorie }}</td>
+          <td class="col-podi">{{ pilota.podi }}</td>
+          <td class="col-punti">
+            <span class="punti">{{ pilota.punti_totali }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Classifica Costruttori -->
+  <div *ngIf="!loading() && vistaAttiva() === 'costruttori'" class="tabella-wrapper">
+    <table class="tabella-classifica">
+      <thead>
+        <tr>
+          <th class="col-pos">Pos</th>
+          <th class="col-scuderia">Scuderia</th>
+          <th class="col-motore">Motore</th>
+          <th class="col-vittorie">Vittorie</th>
+          <th class="col-podi">Podi</th>
+          <th class="col-punti">Punti</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let team of costruttori(); let i = index"
+            class="riga"
+            [class.podio-1]="i === 0"
+            [class.podio-2]="i === 1"
+            [class.podio-3]="i === 2">
+          <td class="col-pos">
+            <span class="posizione" [class.oro]="i===0" [class.argento]="i===1" [class.bronzo]="i===2">
+              {{ i + 1 }}
+            </span>
+          </td>
+          <td>
+            <span class="scuderia-badge"
+                  [style.backgroundColor]="getScuderiaColore(team.nome) + '22'"
+                  [style.borderColor]="getScuderiaColore(team.nome)">
+              {{ team.nome }}
+            </span>
+          </td>
+          <td>{{ team.costruttore_motore }}</td>
+          <td class="col-vittorie">{{ team.vittorie }}</td>
+          <td class="col-podi">{{ team.podi }}</td>
+          <td class="col-punti">
+            <span class="punti">{{ team.punti_totali }}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
