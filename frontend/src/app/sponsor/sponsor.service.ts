@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class SponsorService {
-  private apiUrl = 'https://reimagined-dollop-q7pjjg4gwww6fx5v-5000.app.github.dev/api/sponsor';
+  private apiUrl = 'https://stunning-eureka-gx44w5rr996727pq-5000.app.github.dev/api/sponsor';
 
   constructor(private http: HttpClient) { }
 
@@ -13,15 +13,15 @@ export class SponsorService {
     return this.http.get(this.apiUrl);
   }
 
-  deleteSponsor(id: number){
+  deleteSponsor(id: number) {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
-  addSponsor(nuovoSponsor: any){
-    return this.http.post(this.apiUrl, nuovoSponsor)
+  addSponsor(nuovoSponsor: any) {
+    return this.http.post(this.apiUrl, nuovoSponsor);
   }
 
-  updateSponsor(id: number, sponsorAggiornato: any){
+  updateSponsor(id: number, sponsorAggiornato: any) {
     return this.http.put(`${this.apiUrl}/${id}`, sponsorAggiornato);
   }
 }

@@ -1,7 +1,10 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-danger shadow-sm">
   <div class="container">
     <a class="navbar-brand fw-bold" href="#">🏎️ F1 Manager</a>
-    <div class="collapse navbar-collapse">
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link" routerLink="/scuderie" routerLinkActive="active">Scuderie</a>
@@ -12,11 +15,24 @@
         <li class="nav-item">
           <a class="nav-link" routerLink="/piloti" routerLinkActive="active">Piloti</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/circuiti" routerLinkActive="active">Circuiti</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/gran-premi" routerLinkActive="active">Gran Premi</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/sessioni" routerLinkActive="active">Sessioni</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/risultati" routerLinkActive="active">Risultati</a>
+        </li>
       </ul>
     </div>
   </div>
 </nav>
-
+ 
 <div class="container mt-4">
   <router-outlet></router-outlet>
 </div>
+ 
