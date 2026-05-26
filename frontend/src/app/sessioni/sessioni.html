@@ -1,0 +1,100 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="m-0">🕐 Gestione Sessioni</h2>
+  <button class="btn btn-primary fw-bold shadow-sm"
+    (click)="mostraForm() ? annullaForm() : mostraForm.set(true)">
+    {{ mostraForm() ? 'Chiudi' : '+ Aggiungi Sessione' }}
+  </button>
+</div>
+
+<!-- Filtro per Gran Premio -->
+<div class="card p-3 mb-3 border-0 bg-light shadow-sm">
+  <div class="row align-items-center g-2">
+    <div class="col-auto">
+      <label class="form-label mb-0 fw-semibold">Filtra per Gran Premio:</label>
+    </div>
+    <div class="col-md-4">
+      <select class="form-select" (change)="applicaFiltro($any($event.target).value)">
+        <option value="">Tutti i Gran Premi</option>
+        @for (gp of granPremi(); track gp.id) {
+          <option [value]="gp.id">{{ gp.nome_evento }}</option>
+        }
+      </select>
+    </div>
+  </div>
+</div>
+
+@if (mostraForm()) {
+  <div class="card p-4 mb-4 border-primary shadow-sm">
+    <h4 class="text-primary mb-3">
+      {{ sessioneInModifica() ? 'Modifica Sessione' : 'Nuova Sessione' }}
+    </h4>
+    <form (ngSubmit)="salvaSessione()">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-3">
+          <label class="form-label small">Gran Premio</label>
+          <select class="form-select" [(ngModel)]="nuovaSessione.id_gran_premio" name="gp" required>
+            <option [value]="null" disabled>Seleziona Gran Premio...</option>
+            @for (gp of granPremi(); track gp.id) {
+              <option [value]="gp.id">{{ gp.nome_evento }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label small">Tipo Sessione</label>
+          <select class="form-select" [(ngModel)]="nuovaSessione.tipo" name="tipo" required>
+            @for (t of tipiSessione; track t) {
+              <option [value]="t">{{ t }}</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label small">Data e Ora Inizio</label>
+          <input type="datetime-local" class="form-control"
+            [(ngModel)]="nuovaSessione.orario_inizio" name="orario" required>
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+          @if (sessioneInModifica()) {
+            <button type="button" class="btn btn-secondary" (click)="annullaForm()">Annulla</button>
+          }
+          <button type="submit" class="btn btn-primary">
+            {{ sessioneInModifica() ? 'Aggiorna' : 'Salva' }}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+}
+
+<div class="card shadow-sm border-0">
+  <div class="card-body p-0">
+    <table class="table table-hover table-striped m-0 align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Tipo</th>
+          <th>Gran Premio</th>
+          <th>Data e Ora</th>
+          <th class="text-end px-4">Azioni</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (s of sessioni(); track s.id) {
+          <tr>
+            <td class="fw-bold text-muted">#{{ s.id }}</td>
+            <td><span class="badge {{ badgeTipo(s.tipo) }}">{{ s.tipo }}</span></td>
+            <td class="fw-semibold">{{ s.nome_evento }}</td>
+            <td>{{ s.orario_inizio | date:'dd/MM/yyyy HH:mm' }}</td>
+            <td class="text-end px-4">
+              <button class="btn btn-outline-primary btn-sm me-1" (click)="avviaModifica(s)">Modifica</button>
+              <button class="btn btn-outline-danger btn-sm" (click)="elimina(s.id)">Elimina</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="text-center py-4 text-muted">Nessuna sessione censita nel database.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

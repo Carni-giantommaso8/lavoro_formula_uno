@@ -1,16 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CircuitiComponent } from './circuiti';
 
-describe('CircuitiComponent', () => {
-  let component: CircuitiComponent;
-  let fixture: ComponentFixture<CircuitiComponent>;
+import { GranPremi } from './gran-premi';
+
+describe('GranPremi', () => {
+  let component: GranPremi;
+  let fixture: ComponentFixture<GranPremi>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [CircuitiComponent],
+      imports: [GranPremi],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(CircuitiComponent);
+    fixture = TestBed.createComponent(GranPremi);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

@@ -1,0 +1,91 @@
+<div class="d-flex justify-content-between align-items-center mb-4">
+  <h2 class="m-0">🏆 Gestione Gran Premi</h2>
+  <button class="btn btn-primary fw-bold shadow-sm"
+    (click)="mostraForm() ? annullaForm() : mostraForm.set(true)">
+    {{ mostraForm() ? 'Chiudi' : '+ Aggiungi Gran Premio' }}
+  </button>
+</div>
+
+@if (mostraForm()) {
+  <div class="card p-4 mb-4 border-primary shadow-sm">
+    <h4 class="text-primary mb-3">
+      {{ gpInModifica() ? 'Modifica Gran Premio' : 'Nuovo Gran Premio' }}
+    </h4>
+    <form (ngSubmit)="salvaGP()">
+      <div class="row g-2">
+        <div class="col-md-4">
+          <input type="text" class="form-control" placeholder="Nome evento (es. Gran Premio d'Italia)"
+            [(ngModel)]="nuovoGP.nome_evento" name="nome" required>
+        </div>
+        <div class="col-md-2">
+          <input type="number" class="form-control" placeholder="N° edizione"
+            [(ngModel)]="nuovoGP.edizione_numero" name="edizione" required>
+        </div>
+        <div class="col-md-2">
+          <input type="date" class="form-control"
+            [(ngModel)]="nuovoGP.data_inizio" name="data" required>
+        </div>
+        <div class="col-md-4">
+          <input type="text" class="form-control" placeholder="Meteo previsto (es. Soleggiato, 26C)"
+            [(ngModel)]="nuovoGP.meteo_previsto" name="meteo">
+        </div>
+        <div class="col-md-4">
+          <select class="form-select" [(ngModel)]="nuovoGP.id_circuito" name="circuito" required>
+            <option [value]="null" disabled>Seleziona circuito...</option>
+            @for (c of circuiti(); track c.id) {
+              <option [value]="c.id">{{ c.nome }} ({{ c.nazione }})</option>
+            }
+          </select>
+        </div>
+        <div class="col-md-8 d-flex gap-2 align-items-end">
+          @if (gpInModifica()) {
+            <button type="button" class="btn btn-secondary" (click)="annullaForm()">Annulla</button>
+          }
+          <button type="submit" class="btn btn-primary">
+            {{ gpInModifica() ? 'Aggiorna' : 'Salva' }}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+}
+
+<div class="card shadow-sm border-0">
+  <div class="card-body p-0">
+    <table class="table table-hover table-striped m-0 align-middle">
+      <thead class="table-dark">
+        <tr>
+          <th>ID</th>
+          <th>Evento</th>
+          <th>Edizione</th>
+          <th>Data</th>
+          <th>Circuito</th>
+          <th>Nazione</th>
+          <th>Meteo</th>
+          <th class="text-end px-4">Azioni</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (gp of granPremi(); track gp.id) {
+          <tr>
+            <td class="fw-bold text-muted">#{{ gp.id }}</td>
+            <td class="fw-bold">{{ gp.nome_evento }}</td>
+            <td><span class="badge bg-dark">Ed. {{ gp.edizione_numero }}</span></td>
+            <td>{{ gp.data_inizio | date:'dd/MM/yyyy' }}</td>
+            <td>{{ gp.nome_circuito }}</td>
+            <td>🌍 {{ gp.nazione }}</td>
+            <td>{{ meteoIcon(gp.meteo_previsto) }} <small class="text-muted">{{ gp.meteo_previsto }}</small></td>
+            <td class="text-end px-4">
+              <button class="btn btn-outline-primary btn-sm me-1" (click)="avviaModifica(gp)">Modifica</button>
+              <button class="btn btn-outline-danger btn-sm" (click)="elimina(gp.id)">Elimina</button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="8" class="text-center py-4 text-muted">Nessun Gran Premio censito nel database.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
