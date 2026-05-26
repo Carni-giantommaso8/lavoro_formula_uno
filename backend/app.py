@@ -599,6 +599,8 @@ def delete_risultato(id):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
  
+
+ 
 # ─── CLASSIFICA PILOTI (aggregata) ───────────────────────────────────────────
  
 @app.route("/api/classifica/piloti", methods=['GET'])

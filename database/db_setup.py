@@ -107,17 +107,7 @@ def setup_database():
                 FOREIGN KEY (id_sessione) REFERENCES sessioni(id) ON DELETE CASCADE
             )""")
 
-        mycursor.execute("""
-            CREATE TABLE IF NOT EXISTS squalifiche (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                tipo_infrazione VARCHAR(255),
-                penalita_secondi INT,
-                id_risultato INT,
-                FOREIGN KEY (id_risultato) REFERENCES risultati(id) ON DELETE CASCADE
-            )""")
-
         # ── DELETE (ordine inverso alle dipendenze FK) ─────────────────────
-        mycursor.execute("DELETE FROM squalifiche")
         mycursor.execute("DELETE FROM risultati")
         mycursor.execute("DELETE FROM sessioni")
         mycursor.execute("DELETE FROM gran_premi")
