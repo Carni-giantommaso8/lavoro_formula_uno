@@ -2,8 +2,7 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import mysql.connector
 
-app= Flask(__name__)
-
+app = Flask(__name__)
 CORS(app)
 
 def get_db_connection():
@@ -22,30 +21,24 @@ def home():
 def get_scuderie():
     try:
         conn = get_db_connection()
-        cursor=conn.cursor(dictionary=True)
+        cursor = conn.cursor(dictionary=True)
         cursor.execute("""SELECT scuderie.*, sponsor.nome_societa AS nome_sponsor 
             FROM scuderie 
             LEFT JOIN sponsor ON scuderie.id_sponsor = sponsor.id""")
-        scuderie=cursor.fetchall()
-
+        scuderie = cursor.fetchall()
         cursor.close()
         conn.close()
-
         return jsonify(scuderie)
     except Exception as e:
-        return jsonify({"error":str(e)}), 500
+        return jsonify({"error": str(e)}), 500
 
-#
 @app.route("/api/sponsor", methods=['GET'])
 def get_sponsor():
     try:
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
         query = """
-            SELECT 
-                id, 
-                nome_societa, 
-                settore_merceologico, 
+            SELECT id, nome_societa, settore_merceologico, 
                 CAST(valore_contratto_annuo AS FLOAT) AS valore_contratto_annuo, 
                 CAST(scadenza_contratto AS CHAR) AS scadenza_contratto 
             FROM sponsor
@@ -56,66 +49,59 @@ def get_sponsor():
         conn.close()
         return jsonify(sponsor), 200
     except Exception as e:
-        return jsonify({"error": str(e)}), 500 
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/api/scuderie/<int:id>", methods=['DELETE'])
 def delete_scuderia(id):
     try:
-        conn=get_db_connection()
-        cursor=conn.cursor()
-        cursor.execute("DELETE FROM scuderie WHERE id= %s",(id,))
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM scuderie WHERE id = %s", (id,))
         conn.commit()
-
         cursor.close()
         conn.close()
-
-        return jsonify({"message":"Scuderia eliminata con successo"}),200
+        return jsonify({"message": "Scuderia eliminata con successo"}), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 @app.route("/api/scuderie", methods=['POST'])
 def add_scuderia():
     try:
-        data=request.json
-        conn=get_db_connection()
-        cursor=conn.cursor()
+        data = request.json
+        conn = get_db_connection()
+        cursor = conn.cursor()
         query = """
             INSERT INTO scuderie (nome, team_principal, costruttore_motore, anno_fondazione, id_sponsor) 
             VALUES (%s, %s, %s, %s, %s)
         """
         valori = (data['nome'], data['team_principal'], data['costruttore_motore'], data['anno_fondazione'], data['id_sponsor'])
-        
         cursor.execute(query, valori)
         conn.commit()
-        
         cursor.close()
         conn.close()
         return jsonify({"message": "Scuderia inserita con successo!"}), 201
     except Exception as e:
-        print("ERRORE SERVER DETTAGLIATO:", str(e))
         return jsonify({"error": str(e)}), 500
 
 @app.route("/api/scuderie/<int:id>", methods=['PUT'])
 def update_scuderia(id):
     try:
-        data= request.json
+        data = request.json
         conn = get_db_connection()
-        cursor=conn.cursor()
-        query="""
+        cursor = conn.cursor()
+        query = """
             UPDATE scuderie 
             SET nome = %s, team_principal = %s, costruttore_motore = %s, anno_fondazione = %s, id_sponsor = %s
             WHERE id = %s
         """
-        valori=(data['nome'], data['team_principal'],data['costruttore_motore'], data['anno_fondazione'], data['id_sponsor'], id)
-        cursor.execute(query,valori)
+        valori = (data['nome'], data['team_principal'], data['costruttore_motore'], data['anno_fondazione'], data['id_sponsor'], id)
+        cursor.execute(query, valori)
         conn.commit()
-
         cursor.close()
         conn.close()
-        return jsonify({"message":"Scuderia aggiornata con successo"}), 200
+        return jsonify({"message": "Scuderia aggiornata con successo"}), 200
     except Exception as e:
-        print("ERRORE SERVER:",str(e))
-        return jsonify({"error":str(e)}),500
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/api/sponsor", methods=['POST'])
 def add_sponsor():
@@ -281,6 +267,149 @@ def get_macchina_by_scuderia(id_scuderia):
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-    
+@app.route("/api/classifiche/piloti", methods=['GET'])
+def get_classifica_piloti():
+    try:
+        includi_sprint = request.args.get('sprint', 'true').lower() == 'true'
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        if includi_sprint:
+            tipo_filter = "s.tipo IN ('Gara', 'Sprint')"
+        else:
+            tipo_filter = "s.tipo = 'Gara'"
+
+        query = f"""
+            SELECT 
+                p.id,
+                p.nome,
+                p.cognome,
+                p.numero_gara,
+                sc.nome AS scuderia,
+                COALESCE(SUM(r.punti_assegnati), 0) AS punti_totali,
+                COUNT(CASE WHEN r.posizione_finale = 1 AND s.tipo = 'Gara' THEN 1 END) AS vittorie,
+                COUNT(CASE WHEN r.posizione_finale <= 3 AND s.tipo = 'Gara' THEN 1 END) AS podi
+            FROM piloti p
+            LEFT JOIN scuderie sc ON p.id_scuderia = sc.id
+            LEFT JOIN risultati r ON p.id = r.id_pilota
+            LEFT JOIN sessioni s ON r.id_sessione = s.id 
+            WHERE (s.tipo IS NULL OR {tipo_filter})
+            GROUP BY p.id, p.nome, p.cognome, p.numero_gara, sc.nome
+            ORDER BY punti_totali DESC
+        """
+        cursor.execute(query)
+        classifica = cursor.fetchall()
+        for row in classifica:
+            row['punti_totali'] = float(row['punti_totali'])
+        cursor.close()
+        conn.close()
+        return jsonify(classifica), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/classifiche/costruttori", methods=['GET'])
+def get_classifica_costruttori():
+    try:
+        includi_sprint = request.args.get('sprint', 'true').lower() == 'true'
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        if includi_sprint:
+            tipo_filter = "s.tipo IN ('Gara', 'Sprint')"
+        else:
+            tipo_filter = "s.tipo = 'Gara'"
+
+        query = f"""
+            SELECT 
+                sc.id,
+                sc.nome,
+                sc.costruttore_motore,
+                COALESCE(SUM(r.punti_assegnati), 0) AS punti_totali,
+                COUNT(CASE WHEN r.posizione_finale = 1 AND s.tipo = 'Gara' THEN 1 END) AS vittorie,
+                COUNT(CASE WHEN r.posizione_finale <= 3 AND s.tipo = 'Gara' THEN 1 END) AS podi
+            FROM scuderie sc
+            LEFT JOIN piloti p ON p.id_scuderia = sc.id
+            LEFT JOIN risultati r ON p.id = r.id_pilota
+            LEFT JOIN sessioni s ON r.id_sessione = s.id
+            WHERE (s.tipo IS NULL OR {tipo_filter})
+            GROUP BY sc.id, sc.nome, sc.costruttore_motore
+            ORDER BY punti_totali DESC
+        """
+        cursor.execute(query)
+        classifica = cursor.fetchall()
+        for row in classifica:
+            row['punti_totali'] = float(row['punti_totali'])
+        cursor.close()
+        conn.close()
+        return jsonify(classifica), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+@app.route("/api/circuiti", methods=['GET'])
+def get_circuiti():
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM circuiti ORDER BY id")
+        circuiti = cursor.fetchall()
+        cursor.close()
+        conn.close()
+        return jsonify(circuiti), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/circuiti", methods=['POST'])
+def add_circuito():
+    try:
+        data = request.json
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        query = """
+            INSERT INTO circuiti (nome, localita, nazione, lunghezza_km, numero_curve, record_sul_giro, capacita_spettatori, tipo_circuito)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        valori = (data['nome'], data['localita'], data['nazione'], data['lunghezza_km'],
+                  data['numero_curve'], data['record_sul_giro'], data['capacita_spettatori'], data['tipo_circuito'])
+        cursor.execute(query, valori)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Circuito inserito con successo!"}), 201
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/circuiti/<int:id>", methods=['PUT'])
+def update_circuito(id):
+    try:
+        data = request.json
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        query = """
+            UPDATE circuiti
+            SET nome = %s, localita = %s, nazione = %s, lunghezza_km = %s,
+                numero_curve = %s, record_sul_giro = %s, capacita_spettatori = %s, tipo_circuito = %s
+            WHERE id = %s
+        """
+        valori = (data['nome'], data['localita'], data['nazione'], data['lunghezza_km'],
+                  data['numero_curve'], data['record_sul_giro'], data['capacita_spettatori'], data['tipo_circuito'], id)
+        cursor.execute(query, valori)
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Circuito aggiornato con successo!"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route("/api/circuiti/<int:id>", methods=['DELETE'])
+def delete_circuito(id):
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM circuiti WHERE id = %s", (id,))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        return jsonify({"message": "Circuito eliminato con successo!"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
