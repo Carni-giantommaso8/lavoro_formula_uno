@@ -1,58 +1,56 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
   <h2 class="m-0">🏁 Gestione Circuiti</h2>
-  <button class="btn btn-primary fw-bold shadow-sm"
-    (click)="mostraForm() ? annullaForm() : mostraForm.set(true)">
+  <button class="btn btn-success fw-bold shadow-sm" (click)="mostraForm.set(!mostraForm())">
     {{ mostraForm() ? 'Chiudi' : '+ Aggiungi Circuito' }}
   </button>
 </div>
 
 @if (mostraForm()) {
-  <div class="card p-4 mb-4 border-primary shadow-sm">
-    <h4 class="text-primary mb-3">
-      {{ circuitoInModifica() ? 'Modifica Circuito' : 'Nuovo Circuito' }}
-    </h4>
+  <div class="card p-4 mb-4 border-success shadow-sm">
+    <h4 class="text-success mb-3">{{ circuitoInModifica() ? 'Modifica Circuito' : 'Nuovo Circuito' }}</h4>
     <form (ngSubmit)="salvaCircuito()">
-      <div class="row g-2">
-        <div class="col-md-4">
+      <div class="row align-items-center">
+        <div class="col-md-3 mb-2">
           <input type="text" class="form-control" placeholder="Nome circuito"
             [(ngModel)]="nuovoCircuito.nome" name="nome" required>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2 mb-2">
           <input type="text" class="form-control" placeholder="Località"
             [(ngModel)]="nuovoCircuito.localita" name="localita" required>
         </div>
-        <div class="col-md-3">
+        <div class="col-md-2 mb-2">
           <input type="text" class="form-control" placeholder="Nazione"
             [(ngModel)]="nuovoCircuito.nazione" name="nazione" required>
         </div>
-        <div class="col-md-2">
-          <select class="form-select" [(ngModel)]="nuovoCircuito.tipo_circuito" name="tipo" required>
-            @for (t of tipiCircuito; track t) {
-              <option [value]="t">{{ t }}</option>
-            }
+        <div class="col-md-1 mb-2">
+          <input type="number" step="0.001" class="form-control" placeholder="Km"
+            [(ngModel)]="nuovoCircuito.lunghezza_km" name="lunghezza_km" required>
+        </div>
+        <div class="col-md-1 mb-2">
+          <input type="number" class="form-control" placeholder="Curve"
+            [(ngModel)]="nuovoCircuito.numero_curve" name="numero_curve" required>
+        </div>
+        <div class="col-md-1 mb-2">
+          <input type="text" class="form-control" placeholder="Record"
+            [(ngModel)]="nuovoCircuito.record_sul_giro" name="record_sul_giro">
+        </div>
+        <div class="col-md-1 mb-2">
+          <input type="number" class="form-control" placeholder="Spettatori"
+            [(ngModel)]="nuovoCircuito.capacita_spettatori" name="capacita_spettatori">
+        </div>
+        <div class="col-md-2 mb-2">
+          <select class="form-select" [(ngModel)]="nuovoCircuito.tipo_circuito" name="tipo_circuito" required>
+            <option [ngValue]="null" disabled selected>Tipo...</option>
+            <option value="Permanente">Permanente</option>
+            <option value="Cittadino">Cittadino</option>
+            <option value="Ibrido">Ibrido</option>
           </select>
         </div>
-        <div class="col-md-2">
-          <input type="number" step="0.001" class="form-control" placeholder="Lunghezza (km)"
-            [(ngModel)]="nuovoCircuito.lunghezza_km" name="lunghezza" required>
-        </div>
-        <div class="col-md-2">
-          <input type="number" class="form-control" placeholder="N° curve"
-            [(ngModel)]="nuovoCircuito.numero_curve" name="curve" required>
-        </div>
-        <div class="col-md-2">
-          <input type="text" class="form-control" placeholder="Record giro (es. 1:20.235)"
-            [(ngModel)]="nuovoCircuito.record_sul_giro" name="record" required>
-        </div>
-        <div class="col-md-3">
-          <input type="number" class="form-control" placeholder="Capienza spettatori"
-            [(ngModel)]="nuovoCircuito.capacita_spettatori" name="capienza" required>
-        </div>
-        <div class="col-md-3 d-flex gap-2">
+        <div class="col-md-1 mb-2 d-flex gap-1">
           @if (circuitoInModifica()) {
             <button type="button" class="btn btn-secondary w-50" (click)="annullaForm()">Annulla</button>
           }
-          <button type="submit" class="btn btn-primary"
+          <button type="submit" class="btn btn-success"
             [class.w-50]="circuitoInModifica()" [class.w-100]="!circuitoInModifica()">
             {{ circuitoInModifica() ? 'Aggiorna' : 'Salva' }}
           </button>
@@ -62,46 +60,151 @@
   </div>
 }
 
-<div class="card shadow-sm border-0">
-  <div class="card-body p-0">
-    <table class="table table-hover table-striped m-0 align-middle">
-      <thead class="table-dark">
-        <tr>
-          <th>ID</th>
-          <th>Nome</th>
-          <th>Località</th>
-          <th>Nazione</th>
-          <th>Km</th>
-          <th>Curve</th>
-          <th>Record Giro</th>
-          <th>Spettatori</th>
-          <th>Tipo</th>
-          <th class="text-end px-4">Azioni</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (c of circuiti(); track c.id) {
-          <tr>
-            <td class="fw-bold text-muted">#{{ c.id }}</td>
-            <td class="fw-bold">{{ c.nome }}</td>
-            <td>{{ c.localita }}</td>
-            <td>🌍 {{ c.nazione }}</td>
-            <td>{{ c.lunghezza_km }} km</td>
-            <td>{{ c.numero_curve }}</td>
-            <td><code>{{ c.record_sul_giro }}</code></td>
-            <td>{{ c.capacita_spettatori | number }}</td>
-            <td><span class="badge {{ badgeColor(c.tipo_circuito) }}">{{ c.tipo_circuito }}</span></td>
-            <td class="text-end px-4">
-              <button class="btn btn-outline-primary btn-sm me-1" (click)="avviaModifica(c)">Modifica</button>
-              <button class="btn btn-outline-danger btn-sm" (click)="elimina(c.id)">Elimina</button>
-            </td>
-          </tr>
-        } @empty {
-          <tr>
-            <td colspan="10" class="text-center py-4 text-muted">Nessun circuito censito nel database.</td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  </div>
+<!-- FILTRO TIPO -->
+<div class="d-flex gap-2 mb-4 flex-wrap">
+  <span class="fw-semibold text-muted align-self-center me-1">Filtra per tipo:</span>
+  <button class="btn btn-sm fw-semibold"
+    [class.btn-danger]="filtroTipo() === 'Tutti'"
+    [class.btn-outline-danger]="filtroTipo() !== 'Tutti'"
+    (click)="filtroTipo.set('Tutti')">
+    Tutti ({{ circuiti().length }})
+  </button>
+  <button class="btn btn-sm fw-semibold"
+    [class.btn-success]="filtroTipo() === 'Permanente'"
+    [class.btn-outline-success]="filtroTipo() !== 'Permanente'"
+    (click)="filtroTipo.set('Permanente')">
+    🏟️ Permanente ({{ circuiti().filter(c => c.tipo_circuito === 'Permanente').length }})
+  </button>
+  <button class="btn btn-sm fw-semibold"
+    [class.btn-warning]="filtroTipo() === 'Cittadino'"
+    [class.btn-outline-warning]="filtroTipo() !== 'Cittadino'"
+    (click)="filtroTipo.set('Cittadino')">
+    🏙️ Cittadino ({{ circuiti().filter(c => c.tipo_circuito === 'Cittadino').length }})
+  </button>
+  <button class="btn btn-sm fw-semibold"
+    [class.btn-info]="filtroTipo() === 'Ibrido'"
+    [class.btn-outline-info]="filtroTipo() !== 'Ibrido'"
+    (click)="filtroTipo.set('Ibrido')">
+    🔀 Ibrido ({{ circuiti().filter(c => c.tipo_circuito === 'Ibrido').length }})
+  </button>
 </div>
+
+<!-- CARDS -->
+<div class="row">
+  @for (c of circuitiFiltrati(); track c.id) {
+    <div class="col-md-4 mb-4">
+      <div class="card shadow-sm h-100 border-danger circuito-card" (click)="apriDettaglio(c)">
+        <div class="card-body">
+          <h4 class="card-title text-danger fw-bold">{{ c.nome }}</h4>
+          <h6 class="card-subtitle mb-3 text-muted">
+            <span class="badge me-2" [ngClass]="getTipoBadgeClass(c.tipo_circuito)">{{ c.tipo_circuito }}</span>
+            {{ c.localita }}, {{ c.nazione }}
+          </h6>
+          <p class="card-text">
+            <strong>Lunghezza:</strong> {{ c.lunghezza_km }} km<br>
+            <strong>Curve:</strong> {{ c.numero_curve }}<br>
+            <strong>Spettatori:</strong> {{ c.capacita_spettatori | number }}<br>
+            <strong>Record:</strong> {{ c.record_sul_giro }}
+          </p>
+        </div>
+        <div class="card-footer bg-white border-0 d-flex justify-content-between pb-3"
+             (click)="$event.stopPropagation()">
+          <button class="btn btn-outline-primary btn-sm" (click)="avviaModifica(c)">Modifica</button>
+          <button class="btn btn-outline-danger btn-sm" (click)="elimina(c.id)">Elimina</button>
+        </div>
+      </div>
+    </div>
+  } @empty {
+    <div class="col-12 text-center mt-5">
+      <p class="text-muted">Nessun circuito trovato per questo tipo.</p>
+    </div>
+  }
+</div>
+
+<!-- MODAL -->
+@if (modalAperto()) {
+  <div class="modal-backdrop-f1" (click)="chiudiModal()"></div>
+  <div class="modal-wrapper-f1">
+    <div class="modal-dialog-f1" (click)="$event.stopPropagation()">
+
+      <div class="modal-header-f1">
+        <div>
+          <span class="badge me-2" [ngClass]="getTipoBadgeClass(circuitoSelezionato()?.tipo_circuito)">
+            {{ circuitoSelezionato()?.tipo_circuito }}
+          </span>
+          <span class="fs-4 fw-bold">{{ circuitoSelezionato()?.nome }}</span>
+        </div>
+        <button class="btn btn-sm btn-outline-light fw-bold" (click)="chiudiModal()">✕</button>
+      </div>
+
+      <div class="modal-body-f1">
+
+        <!-- FOTO CIRCUITO -->
+        <div class="text-center mb-4">
+          @if (getFotoCircuito(circuitoSelezionato()?.nome)) {
+            <img [src]="getFotoCircuito(circuitoSelezionato()?.nome)"
+                 alt="Foto circuito"
+                 class="foto-circuito-modal"
+                 (error)="$any($event.target).style.display='none'">
+          } @else {
+            <div class="placeholder-foto-circuito">🏁</div>
+          }
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <h5 class="text-danger fw-bold mb-3">📍 Informazioni</h5>
+            <table class="table table-sm table-borderless mb-0">
+              <tbody>
+                <tr>
+                  <td class="fw-semibold text-muted" style="width:45%">Nome</td>
+                  <td class="fw-bold">{{ circuitoSelezionato()?.nome }}</td>
+                </tr>
+                <tr>
+                  <td class="fw-semibold text-muted">Località</td>
+                  <td>{{ circuitoSelezionato()?.localita }}</td>
+                </tr>
+                <tr>
+                  <td class="fw-semibold text-muted">Nazione</td>
+                  <td>{{ circuitoSelezionato()?.nazione }}</td>
+                </tr>
+                <tr>
+                  <td class="fw-semibold text-muted">Tipo</td>
+                  <td>
+                    <span class="badge" [ngClass]="getTipoBadgeClass(circuitoSelezionato()?.tipo_circuito)">
+                      {{ circuitoSelezionato()?.tipo_circuito }}
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="col-md-6">
+            <h5 class="text-danger fw-bold mb-3">📊 Dati Tecnici</h5>
+            <table class="table table-sm table-borderless mb-0">
+              <tbody>
+                <tr>
+                  <td class="fw-semibold text-muted" style="width:55%">Lunghezza</td>
+                  <td class="fw-bold">{{ circuitoSelezionato()?.lunghezza_km }} km</td>
+                </tr>
+                <tr>
+                  <td class="fw-semibold text-muted">Numero curve</td>
+                  <td>{{ circuitoSelezionato()?.numero_curve }}</td>
+                </tr>
+                <tr>
+                  <td class="fw-semibold text-muted">Record sul giro</td>
+                  <td class="fw-bold text-success">{{ circuitoSelezionato()?.record_sul_giro }}</td>
+                </tr>
+                <tr>
+                  <td class="fw-semibold text-muted">Capienza spettatori</td>
+                  <td>{{ circuitoSelezionato()?.capacita_spettatori | number }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+}
