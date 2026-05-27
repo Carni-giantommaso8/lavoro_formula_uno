@@ -31,10 +31,6 @@ export class PilotiService {
     return this.http.put(`${this.apiUrl}/${id}`, datiAggiornati);
   }
 
-  getPilotaById(id: number) {
-    return this.http.get(`${this.apiUrl}/${id}`);
-  }
-
   getMacchinaByScuderia(idScuderia: number) {
     return this.http.get(`${this.macchineUrl}/scuderia/${idScuderia}`);
   }

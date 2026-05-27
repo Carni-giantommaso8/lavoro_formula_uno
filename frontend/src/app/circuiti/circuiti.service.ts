@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
   providedIn: 'root'
 })
 export class CircuitiService {
-  private apiUrl = 'https://reimagined-dollop-q7pjjg4gwww6fx5v-5000.app.github.dev/api/circuiti';
+  private apiUrl = 'https://stunning-eureka-gx44w5rr996727pq-5000.app.github.dev/api/circuiti';
 
   constructor(private http: HttpClient) {}
 
